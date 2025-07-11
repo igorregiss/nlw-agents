@@ -2,11 +2,13 @@ import { fastify } from 'fastify';
 import {
     serializerCompiler,
     validatorCompiler,
-   type zodTypeProvider,
+    type ZodTypeProvider,
 } from 'fastify-type-provider-zod'
+import { sql } from './db/connection.ts'
 import { fastifyCors } from '@fastify/cors'
+import { env } from './env.ts';
 
-const app = fastify().withTypeProvider<zodTypeProvider>()   
+const app = fastify().withTypeProvider<ZodTypeProvider>()   
 
 app.register(fastifyCors, {
     origin: 'https://localhost:5173',
@@ -15,9 +17,11 @@ app.register(fastifyCors, {
 app.setSerializerCompiler(serializerCompiler)
 app.setValidatorCompiler(validatorCompiler)
 
-app.listen({
-    port: process.env.PORT ? Number(process.env.PORT) : 3333
-}).then(() => {
+app.get('/health',  () => {
+    return 'ok'
+})
+
+app.listen({ port: env.PORT }).then(() => {
     console.log('HTTP server running on http://localhost:3333')
-    console.log(`Port: ${process.env.PORT}`)
+    console.log(`Port: ${env.PORT}`)
 })
